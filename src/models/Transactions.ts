@@ -1,7 +1,5 @@
-import { ObjectId } from "mongodb";
-
 export interface TransactionType {
-	id: string
+	id: string;
 	debit: number | string;
 	credit: number | string;
 	date: Date | string;
@@ -10,6 +8,12 @@ export interface TransactionType {
 	receiverName: string;
 	receiverAccount: string;
 	value: string;
+	additionalData: {
+		street: string,
+		city: string,
+		gender: string
+	};
+	bookedAt: string | null;
 }
 
-export type TransactionDb = Omit<TransactionType, 'id'> & {_id: string}
+export type TransactionDb = Omit<TransactionType, "id"> & { _id: string }

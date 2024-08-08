@@ -27,6 +27,8 @@ app.use(cors({ origin: '*' }));
     const service = new TransactionService(new MongoMapper(database.collection(process.env.COLLECTION_NAME!), new MongoTransactionSerializer()) );
     const transactionsController = new Controller(service);
 
+    // await service.seedTransactions();
+
     registerRoutes(app, transactionsController);
 
   } catch (err) {

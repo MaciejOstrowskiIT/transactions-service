@@ -36,7 +36,9 @@ export class Transaction implements IDomain<TransactionType>{
             senderAccount: this.senderAccount,
             receiverName: this.receiverName,
             receiverAccount: this.receiverAccount,
-            value: this.value
+            value: this.value,
+            additionalData: this.additionalData,
+            bookedAt: this.bookedAt,
         }
     }
 
@@ -45,9 +47,9 @@ export class Transaction implements IDomain<TransactionType>{
     }
 
 
-    fixProblem(key: TransactionKeys, value: string) {
-        this[key] = value
-    }
+    // fixProblem(key: TransactionKeys, value: string) {
+    //     this[key] = value
+    // }
 
     bookTransaction(date: string) {
         this.bookedAt = date
@@ -70,6 +72,6 @@ export class Transaction implements IDomain<TransactionType>{
     //         username: this.username
     //     }
     // }
-    
+
 
 }

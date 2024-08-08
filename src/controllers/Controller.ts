@@ -1,14 +1,13 @@
 import { Request, Response } from "express";
 import { TransactionType } from "../models/Transactions";
 import { TransactionService } from "../services/TransactionService";
-import { rmSync } from "fs";
 
 export class Controller {
 	constructor(private service: TransactionService) {}
 
 	public async getTransactions(req: Request, res: Response) {
 		try {
-			const transactions = this.service.fetchAll()
+			const transactions = await this.service.fetchAll()
 			res.status(200).send(transactions);
 		} catch(err) {
 			res.status(504).send(err);
@@ -17,7 +16,7 @@ export class Controller {
 
 	public async createTransaction(req: Request, res: Response) {
 		try {
-			const { debit, credit, value, senderName, senderAccount, receiverName, receiverAccount } = req.body;
+			const { debit, credit, value, senderName, senderAccount, receiverName, receiverAccount, bookedAt, additionalData } = req.body;
 		
 			const transaction: Omit<TransactionType, 'id'> = {
 				debit,
@@ -27,7 +26,9 @@ export class Controller {
 				senderName,
 				senderAccount,
 				receiverName,
-				receiverAccount
+				receiverAccount,
+				bookedAt,
+				additionalData
 			};
 			await this.service.create( transaction );
 			res.status( 200 ).json( { message: 'Object has been created successfuly' } );

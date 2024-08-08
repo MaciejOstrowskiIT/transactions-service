@@ -1,21 +1,53 @@
-import { Collection, ObjectId, InsertOneResult } from "mongodb";
-import { IGetter } from "../interfaces/IGetter";
-import { TransactionDb, TransactionType } from "../models/Transactions";
-import { ISetter } from "../interfaces/ISetter";
+import { TransactionType } from "../models/Transactions";
 import { Transaction } from "../domain/Transaction";
 import { DataMapper } from "../models/DataMapper";
-import {v4 as uuidv4} from 'uuid'
+import { v4 as uuidv4 } from "uuid";
 
-export class TransactionService
-{
+export class TransactionService {
 	constructor(private transactions: DataMapper<Transaction>) {}
 
+	async seedTransactions() {
+		const transactions = [];
+		for (let i = 0; i < 10; i++) {
+			const transaction = {
+				debit: `Account ${Math.floor(Math.random() * 100)}`,
+				credit: `Account ${Math.floor(Math.random() * 100)}`,
+				date: new Date(Date.now() - Math.floor(Math.random() * 1000000000)),
+				senderName: `Sender ${Math.floor(Math.random() * 100)}`,
+				senderAccount: `Account ${Math.floor(Math.random() * 100)}`,
+				receiverName: `Receiver ${Math.floor(Math.random() * 100)}`,
+				receiverAccount: `Account ${Math.floor(Math.random() * 100)}`,
+				value: String(Math.floor(Math.random() * 1000)),
+				additionalData: {
+					street: `Street ${Math.floor(Math.random() * 100)}`,
+					city: `City ${Math.floor(Math.random() * 100)}`,
+					gender: Math.random() < 0.5 ? 'Male' : 'Female',
+				},
+				bookedAt: String(new Date(Date.now() - Math.floor(Math.random() * 1000000000))),
+			};
+			transactions.push(transaction);
+		}
 
-	async create(request: Omit<TransactionType, 'id'>) {
-		const transaction = new Transaction(uuidv4(), request.debit, request.credit, request.date, request.senderName,
-			request.senderAccount, request.receiverName, request.receiverAccount, request.value
-		)
-		await this.transactions.insert(transaction)
+		for (const transaction of transactions) {
+			await this.create(transaction);
+		}
+	}
+
+	async create(request: Omit<TransactionType, "id">) {
+		const transaction = new Transaction(
+			uuidv4(),
+			request.debit,
+			request.credit,
+			request.date,
+			request.senderName,
+			request.senderAccount,
+			request.receiverName,
+			request.receiverAccount,
+			request.value,
+			request.additionalData,
+			request.bookedAt,
+		);
+		await this.transactions.insert(transaction);
 	}
 
 	async fetch(id: string) {
@@ -24,18 +56,18 @@ export class TransactionService
 
 	async bookTransaction(id: string) {
 		const transaction = await this.fetch(id);
-		if(!transaction) {
+		if (!transaction) {
 			return;
 		}
-		transaction.bookTransaction('12-12-2000');
+		transaction.bookTransaction("12-12-2000");
 		await this.transactions.update(transaction);
-		return 'updated'
+		return "updated";
 	}
 
 	async getUserData(id: string) {
 		const user = await this.fetch(id);
-		if(!user) return; //obsluga bledu
-		return user.getUserData() // nasza metoda .mapToUserData()
+		if (!user) return; //obsluga bledu
+		return user.getUserData(); // nasza metoda .mapToUserData()
 
 		/*jak osbluzyc nowa logike biznesowa korzystajac z tego template'u aplikacji
 		1. Tworzymy nowy route.
@@ -57,12 +89,13 @@ export class TransactionService
 
 	async correctTransaction(id: string, newValue: string) {
 		const transaction = await this.transactions.fetch(id);
-		if(!transaction) {
-			throw new Error('Transaction not found')
+		if (!transaction) {
+			throw new Error("User not found");
 		}
 		transaction.correct(newValue);
-		await this.transactions.update(transaction)
+		await this.transactions.update(transaction);
 	}
+
 	// async getAll() {
 	// 	return await this.collection.find().toArray();
 	// }
@@ -71,10 +104,10 @@ export class TransactionService
 	// 	return await this.collection.findOne( id );
 	// }
 
-	// async createOne(transaction: Transaction): Promise<TransactionType | null> {
+	// async createOne(transaction: User): Promise<TransactionType | null> {
 
 	// 	const newTransactionId = await this.collection.insertOne( this.mapToDb(transaction) );
-		
+
 	//  	return await this.collection.findOne({_id: newTransactionId.insertedId})
 	// }
 
@@ -82,7 +115,7 @@ export class TransactionService
 
 	// }
 
-	// private mapToDb(entity: Transaction) {
+	// private mapToDb(entity: User) {
 	// 	return {_id: entity.getId(), ...entity}
 
 	// }
