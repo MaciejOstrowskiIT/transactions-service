@@ -2,9 +2,10 @@ import { TransactionType } from "../models/Transactions";
 import { Transaction } from "../domain/Transaction";
 import { DataMapper } from "../models/DataMapper";
 import { v4 as uuidv4 } from "uuid";
+import { AMQP } from "../amqp/config";
 
 export class TransactionService {
-	constructor(private transactions: DataMapper<Transaction>) {}
+	constructor(private transactions: DataMapper<Transaction>, private amqp: AMQP) {}
 
 	async seedTransactions() {
 		const transactions = [];
@@ -31,6 +32,7 @@ export class TransactionService {
 		for (const transaction of transactions) {
 			await this.create(transaction);
 		}
+		this.amqp.send('transactions', 'create-transaction', {message: 'zrobilismy se transakcje'})
 	}
 
 	async create(request: Omit<TransactionType, "id">) {
