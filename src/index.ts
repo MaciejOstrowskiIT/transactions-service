@@ -9,6 +9,7 @@ import { registerRoutes } from './utils/registerRoutes';
 import { MongoMapper } from './mappers/MongoMapper';
 import { MongoTransactionSerializer } from './mappers/MongoTransactionSerializer';
 import { AMQP, Exchange } from './amqp/config';
+import { CreateTransactionHandler } from './handlers/CreateTransactionHandler';
 
 const app = express();
 app.use(express.json());
@@ -24,7 +25,10 @@ app.use(cors({ origin: '*' }));
       {name: 'transactions', queues: ['create-transactions']}
     ]
     const amqp = new AMQP(exchanges);
-    await amqp.config(); 
+    await amqp.config();
+    // await amqp.consume();
+    const createTransactionHandler = new CreateTransactionHandler(amqp.channel)
+    createTransactionHandler.handleMessage();
 
     app.listen(process.env.PORT, () => {
       logger('info', 'Microservice is working fine at port ' + process.env.PORT);

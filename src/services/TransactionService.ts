@@ -33,6 +33,14 @@ export class TransactionService {
 			await this.create(transaction);
 		}
 		this.amqp.send('transactions', 'create-transaction', {message: 'zrobilismy se transakcje'})
+		// this.amqp.send('transactions', 'create-transaction', {message: 'zrobilismy se transakcje'})
+		// this.amqp.send('transactions', 'create-transaction', {message: 'zrobilismy se transakcje'})
+		// this.amqp.send('transactions', 'create-transaction', {message: 'zrobilismy se transakcje'})
+		// this.amqp.send('transactions', 'create-transaction', {message: 'zrobilismy se transakcje'})
+		// this.amqp.send('transactions', 'create-transaction', {message: 'zrobilismy se transakcje'})
+		// this.amqp.send('transactions', 'create-transaction', {message: 'zrobilismy se transakcje'})
+		// this.amqp.send('transactions', 'create-transaction', {message: 'zrobilismy se transakcje'})
+
 	}
 
 	async create(request: Omit<TransactionType, "id">) {

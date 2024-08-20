@@ -1,5 +1,6 @@
 import amqplib from 'amqplib';
 import { logger } from '../utils/logs';
+import { transactionsConsumer } from './consumers/transactionsConsumer';
 
 export interface Exchange {
     name: string;
@@ -33,7 +34,12 @@ export class AMQP {
                     return;
                 }
                 try {
-                    const connection = await amqplib.connect(process.env.AMQP!);
+                    const connection = await amqplib.connect(process.env.AMQP!,
+                      {
+                          clientProperties: {
+                              connection_name: 'TRANSACTIONS-SERVICE',
+                          },
+                      });
                     clearInterval(interval);
                     logger('success', 'Connected to AMQP');
                     const channel = await connection.createChannel();
@@ -68,5 +74,9 @@ export class AMQP {
 
     public send(exchange: string, routingKey: string, payload: unknown) {
         this.channel.publish(exchange, routingKey, Buffer.from(JSON.stringify(payload)));
+    }
+
+    public async consume() {
+        await transactionsConsumer(this.channel)
     }
 }
